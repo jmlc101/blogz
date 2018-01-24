@@ -9,7 +9,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
-
+##
+# TODO - Hash passwords.
+##
+# TODO - Do I need "before_request" handler and "require_login" function?
 class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -61,11 +64,12 @@ def newpost():
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
+        owner = User.query.filter_by(username=session['username']).first()
         if (title == '') or (body == ''): # TODO - come up with better validation tech.
             error = 'Please enter "Title" and "Content" for new blog entry...'
             return render_template('newpost.html', title="Build A Blog!", error=error) # TODO - rewrite this using Flash Messages.
         else:
-            new_blog = Blog(title, body)
+            new_blog = Blog(title, body, owner)
             db.session.add(new_blog)
             db.session.commit()
             id = new_blog.id
