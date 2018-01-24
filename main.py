@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:1234@localhost:8889/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
@@ -15,10 +15,23 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     body = db.Column(db.String(2000))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, body):
+    def __init__(self, title, body, owner):
         self.title = title
         self.body = body
+        self.owner = owner
+
+class User(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120))
+    password = db.Column(db.String(120))
+    blogz = db.relationship('Blog', backref='owner')
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -68,7 +81,17 @@ def display():
     blog_body = blog.body
     return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
 
+@app.route('/signup')
 
+@app.route('/login')
+def login():
+
+
+@app.route('/index')
+
+@app.route('/logout')
+def logout():
+    return redirect('/')
 
 
 if __name__ == '__main__':
