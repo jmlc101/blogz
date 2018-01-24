@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="/signup">Create Account</a> 
+<h1>Login</h1>
+<form action="/login" method="POST" autocomplete="on">
+    <table>
+        <tbody>
+            <tr>
+                <td>
+                    <label for="username">Username*</label>
+                </td>
+                <td>
+                    <input name="username" type="text" value="{{ name }}" autocomplete='on'>
+                    {% if user_name_error %}
+                    <span class="error">{{ user_name_error }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="password">Password**</label>
+                </td>
+                <td>
+                    <input name="password" type="password">
+                    {% if pass_error %}
+                    <span class="error">{{ pass_error }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="submit" value='Login'>
+</form>
+
+{% endblock %}

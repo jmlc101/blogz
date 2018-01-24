@@ -1,5 +1,6 @@
-from flask import Flask, request, redirect, render_template
-from flask_sqlalchemy import SQLAlchemy 
+from flask import Flask, request, redirect, render_template, session
+from flask_sqlalchemy import SQLAlchemy
+from validate_input import validate_input
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -8,7 +9,11 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
+app.secret_key = 'IllWorryAboutThisLater' # TODO - worry about this :)
 
+
+
+# TODO - Need to change '/' to '/blog' and '/home' to '/' as per directions....
 ##
 # TODO - Hash passwords.
 ##
@@ -30,11 +35,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120))
     password = db.Column(db.String(120))
+    email = db.Column(db.String(120))
     blogz = db.relationship('Blog', backref='owner')
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, email):
         self.username = username
         self.password = password
+        self.email = email
+
+@app.route('/home')
+def home():
+    return render_template('index.html') # TODO - Will display list of usernames.
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -85,23 +96,43 @@ def display():
     blog_body = blog.body
     return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST', 'GET'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+        email = request.form['email']
+
+        # TODO - VALIDATE USER DATA ON YOUR OWN
+        #if data valid, create User
+
+        existing_user = User.query.filter_by(email=email).first() #query syntax? if user exist, will assign vaule otherwise will assign 'NONE'.
+        if not existing_user: #if not existing user, create user.
+            
+            # TODO - this session assignment needs to be AFTER validation!!!!!!!
+            # TODO - I need to re-write sign up validation to me more usable for other apps!!!!
+            return validate_input(username, password, verify, email)
+        else:
+            # TODO - user better response messaging
+            return "<h1>Duplicate user</h1>"
+
+    return render_template('signup.html')
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
-    # TODO - add validation that makes sure username doesn't already exist and what-not.
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
-            session['username'] = username
-            return redirct('/')
+            session['username'] = username # TODO - Need message for new user confirming they are now "logged in"
+            return redirect('/newpost')
         elif user and user.password != password:
             return redirect('/login')# TODO - flash incorrect password.
         elif not user:
-            return redirect('/login') # TODO - flash no user.
+            return redirect('/login') # TODO - flash no user. (directions says redirect to login but maybe? REDIRECT TO SIGNUP)
 
     return render_template('login.html')
 
@@ -109,9 +140,11 @@ def login():
 
 @app.route('/logout')
 def logout():
-    del session['username']
-    return redirect('/')
-
+    if session:
+        del session['username']
+        return redirect('/')
+    else:
+        return redirect('/') # TODO - make sure all redirects are correct.
 
 if __name__ == '__main__':
     app.run()
