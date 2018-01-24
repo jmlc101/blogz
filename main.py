@@ -25,12 +25,12 @@ class Blog(db.Model):
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120))
+    username = db.Column(db.String(120))
     password = db.Column(db.String(120))
     blogz = db.relationship('Blog', backref='owner')
 
-    def __init__(self, email, password):
-        self.email = email
+    def __init__(self, username, password):
+        self.username = username
         self.password = password
 
 @app.route('/', methods=['POST', 'GET'])
@@ -83,14 +83,29 @@ def display():
 
 @app.route('/signup')
 
-@app.route('/login')
+@app.route('/login', methods=["POST", "GET"])
 def login():
+    # TODO - add validation that makes sure username doesn't already exist and what-not.
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = User.query.filter_by(username=username).first()
+        if user and user.password == password:
+            session['username'] = username
+            return redirct('/')
+        elif user and user.password != password:
+            return redirect('/login')# TODO - flash incorrect password.
+        elif not user:
+            return redirect('/login') # TODO - flash no user.
 
+    return render_template('login.html')
 
 @app.route('/index')
 
 @app.route('/logout')
 def logout():
+    del session['username']
     return redirect('/')
 
 
