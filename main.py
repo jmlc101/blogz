@@ -13,13 +13,12 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'IllWorryAboutThisLater' # TODO - worry about this :)
 
-
-# TODO - Add a DateTime column, look at build-a-blog bonus.
 # TODO - Need to change '/' to '/blog' and '/home' to '/' as per directions....
 ##
 # TODO - Hash passwords.
-##
-# TODO - Do I need "before_request" handler and "require_login" function?
+# TODO - Try to break it.
+
+
 class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +62,7 @@ def require_login():
 @app.route('/home') # TODO - Change this to '/'
 def index():
     users = User.query.filter(User.id > 0).all()
-    return render_template('index.html', users=users) # TODO - Will display list of usernames.
+    return render_template('index.html', users=users)
 
 @app.route('/blog', methods=['POST', 'GET'])
 def list_blogs():
@@ -82,7 +81,7 @@ def list_blogs():
             bodys = []
             blogs = Blog.query.filter(Blog.id > 0).all()
             flipped_blogs = []
-            for blog in reversed(blogs):
+            for blog in reversed(blogs):# TODO - Try doing this a more complex way, as the bonus suggests.
                 flipped_blogs.append(blog)
 
             for blog in blogs:
@@ -90,20 +89,20 @@ def list_blogs():
             return render_template('blog.html', title="Blogs", blogs=flipped_blogs, bodys=bodys)
 
 # Dead code beneath?:
-    blog_titles = [] # Dead Code?
-    bodys = []
-    blogs = Blog.query.filter(Blog.id > 0).all()
-    
-    # TODO - Try doing this a more complex way, as the bonus suggests.
-    #flip blogs list around, the simple way
-    flipped_blogs = []
-    for blog in reversed(blogs):
-        flipped_blogs.append(blog)
-
-    for blog in blogs:
-        blog_titles.append(blog.title) # Dead Code?
-        bodys.append(blog.body)
-    return render_template('blog.html',title="Build A Blog!", blogs=flipped_blogs, blog_titles=blog_titles, bodys=bodys)
+#    blog_titles = [] # Dead Code?
+#    bodys = []
+#    blogs = Blog.query.filter(Blog.id > 0).all()
+#    
+#    # TODO - Try doing this a more complex way, as the bonus suggests.
+#    #flip blogs list around, the simple way
+#    flipped_blogs = []
+#    for blog in reversed(blogs):
+#        flipped_blogs.append(blog)###
+#
+#    for blog in blogs:
+#        blog_titles.append(blog.title) # Dead Code?
+#        bodys.append(blog.body)
+#    return render_template('blog.html',title="Build A Blog!", blogs=flipped_blogs, blog_titles=blog_titles, bodys=bodys)
 
 @app.route('/singleUser')
 def users_blogs():
@@ -122,7 +121,7 @@ def display():
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
-    # TODO - Need validation to make sure body is string under 2000 characters, ad db.Column specifies above.
+    # TODO - Need validation to make sure body is string under 2000 characters, as db.Column specifies above.
 
     # TODO - If either the blog title or blog body is left empty in the new post form, 
     #           the form is rendered again, with a helpful error message and 
@@ -155,7 +154,7 @@ def signup():
         verify = request.form['verify']
         email = request.form['email']
 
-        existing_user = User.query.filter_by(username=username).first() #query syntax? if user exist, will assign vaule otherwise will assign 'NONE'.
+        existing_user = User.query.filter_by(username=username).first() #If user exists, will assign vaule, otherwise will assign 'NONE'.
         if not existing_user:
             return validate_input(username, password, verify, email)
         else:
@@ -182,7 +181,7 @@ def login():
             return redirect('/login')
         elif not user:
             flash('Username does not exist.')
-            return redirect('/login') # TODO - flash no user. (directions says redirect to login but maybe? REDIRECT TO SIGNUP)
+            return redirect('/login')
 
     return render_template('login.html')
 
@@ -190,13 +189,13 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if 'username' in session: # Should I change this to "if 'username' in session:" ??
+    if 'username' in session:
         del session['username']
         flash("You've logged out.")
         return redirect('/blog')
     elif 'username' not in session:
         flash("Not logged in.")
-        return redirect('/blog') # TODO - make sure all redirects are correct.
+        return redirect('/blog')
 
 if __name__ == '__main__':
     app.run()
