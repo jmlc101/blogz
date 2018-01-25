@@ -158,6 +158,9 @@ def signup():
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
+    if session:
+        flash('Already logged in.')
+        return redirect('/blog')
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
