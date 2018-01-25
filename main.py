@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 app.secret_key = 'IllWorryAboutThisLater' # TODO - worry about this :)
 
 
-
+# TODO - Add a DateTime column, look at build-a-blog bonus.
 # TODO - Need to change '/' to '/blog' and '/home' to '/' as per directions....
 ##
 # TODO - Hash passwords.
@@ -48,11 +48,12 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'index', 'signup']
+    allowed_routes = ['login', 'list_blogs', 'index', 'signup', 'logout']
     if request.endpoint not in allowed_routes and 'username' not in session:
+        flash("Please Log In to post blog's")
         return redirect('/login')
 
-@app.route('/home')
+@app.route('/home') # TODO - Change this to '/'
 def index():
     users = User.query.filter(User.id > 0).all()
     return render_template('index.html', users=users) # TODO - Will display list of usernames.
@@ -147,18 +148,11 @@ def signup():
         verify = request.form['verify']
         email = request.form['email']
 
-        # TODO - VALIDATE USER DATA ON YOUR OWN
-        #if data valid, create User
-
         existing_user = User.query.filter_by(username=username).first() #query syntax? if user exist, will assign vaule otherwise will assign 'NONE'.
-        if not existing_user: #if not existing user, create user.
-            
-            # TODO - this session assignment needs to be AFTER validation!!!!!!!
-            # TODO - I need to re-write sign up validation to me more usable for other apps!!!!
+        if not existing_user:
             return validate_input(username, password, verify, email)
         else:
-            # TODO - user better response messaging
-            return "<h1>Duplicate user</h1>"
+            return render_template('signup.html', user_name_error='Username already exists.')
 
     return render_template('signup.html')
 
@@ -188,8 +182,10 @@ def login():
 def logout():
     if session: # Should I change this to "if 'username' in session:" ??
         del session['username']
+        flash("You've logged out.")
         return redirect('/blog')
-    else:
+    elif not session:
+        flash("Not logged in.")
         return redirect('/blog') # TODO - make sure all redirects are correct.
 
 if __name__ == '__main__':
