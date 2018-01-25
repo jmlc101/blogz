@@ -59,7 +59,7 @@ def require_login():
         flash("Please Log In to post blog's")
         return redirect('/login')
 
-@app.route('/home') # TODO - Change this to '/'
+@app.route('/') # TODO - Change this to '/'
 def index():
     users = User.query.filter(User.id > 0).all()
     return render_template('index.html', users=users)
