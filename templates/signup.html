@@ -2,6 +2,20 @@
 
 {% block content %}
 <h1>Signup</h1>
+<div class='box'>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+
+
+
 <form action="/signup" method="POST" autocomplete="on">
     <table>
         <tbody>
@@ -51,9 +65,10 @@
             </tr>
         </tbody>
     </table>
-    <input type="submit" value='Signup'>
+    <input type="submit" value='Submit'>
 </form>
 <hr>
 <p>*(Username must be between 3-20 character's long and contain No spaces.)</p>
 <p>**(Password must be between 3-20 character's long and contain No spaces.)</p>
 {% endblock %}
+</div>

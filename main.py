@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from validate_input import validate_input
 
@@ -48,7 +48,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'list_blogs', 'index', 'signup']
+    allowed_routes = ['login', 'index', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -110,7 +110,7 @@ def display():
     blog = Blog.query.filter_by(id=id).first()
     blog_title = blog.title
     blog_body = blog.body
-    return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
+    return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body, blog=blog)
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
@@ -150,7 +150,7 @@ def signup():
         # TODO - VALIDATE USER DATA ON YOUR OWN
         #if data valid, create User
 
-        existing_user = User.query.filter_by(email=email).first() #query syntax? if user exist, will assign vaule otherwise will assign 'NONE'.
+        existing_user = User.query.filter_by(username=username).first() #query syntax? if user exist, will assign vaule otherwise will assign 'NONE'.
         if not existing_user: #if not existing user, create user.
             
             # TODO - this session assignment needs to be AFTER validation!!!!!!!
@@ -170,11 +170,14 @@ def login():
         
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
-            session['username'] = username # TODO - Need message for new user confirming they are now "logged in"
+            session['username'] = username 
+            flash("Welcome! You're Logged in!")
             return redirect('/newpost')
         elif user and user.password != password:
-            return redirect('/login')# TODO - flash incorrect password.
+            flash('Incorrect password.')
+            return redirect('/login')
         elif not user:
+            flash('Username does not exist.')
             return redirect('/login') # TODO - flash no user. (directions says redirect to login but maybe? REDIRECT TO SIGNUP)
 
     return render_template('login.html')

@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="/signup">Create Account</a> 
+ 
 <h1>Login</h1>
+<div class='box'>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+
+
 <form action="/login" method="POST" autocomplete="on">
     <table>
         <tbody>
             <tr>
                 <td>
-                    <label for="username">Username*</label>
+                    <label for="username">Username</label>
                 </td>
                 <td>
                     <input name="username" type="text" value="{{ name }}" autocomplete='on'>
@@ -19,7 +32,7 @@
             </tr>
             <tr>
                 <td>
-                    <label for="password">Password**</label>
+                    <label for="password">Password</label>
                 </td>
                 <td>
                     <input name="password" type="password">
@@ -30,7 +43,9 @@
             </tr>
         </tbody>
     </table>
-    <input type="submit" value='Login'>
+    <input type="submit" value='Submit'>
 </form>
+<p>Don't have an account? <a href="/signup">Create One!</a></p>
+</div>
 
 {% endblock %}

@@ -54,7 +54,7 @@ a:hover, a:focus, a:active {
 	min-width: 470px;
 	width: 100%;
 	}
-#box {
+.box {
     width: 100%;
     height: 450px;
     overflow: scroll;
@@ -69,6 +69,6 @@ a:hover, a:focus, a:active {
     height: 120px;
     overflow: scroll;
 }
-.error {
+.flashes {
 	color: red;
 }

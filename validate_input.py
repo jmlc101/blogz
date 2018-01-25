@@ -1,5 +1,5 @@
 def validate_input(username, password, verify, email):
-    from flask import Flask, render_template, request, redirect
+    from flask import Flask, render_template, request, redirect, flash
     import re
     from sign_up_validation import SignUpValidation
     
@@ -23,8 +23,9 @@ def validate_input(username, password, verify, email):
         new_user = User(username, password, email)
         db.session.add(new_user)
         db.session.commit()
-        session['username'] = username # TODO - Need message for new user confirming they are now "logged in"
-        return render_template("newpost.html")
+        session['username'] = username 
+        flash("Welcome! You're Logged in!")
+        return redirect("/newpost")
         
     if username == '':
         if password == '':
@@ -110,8 +111,9 @@ def validate_input(username, password, verify, email):
             new_user = User(username, password, email)
             db.session.add(new_user)
             db.session.commit()
-            session['username'] = username # TODO - Need message for new user confirming they are now "logged in"
-            return render_template("newpost.html")
+            session['username'] = username
+            flash("Welcome! You're Logged in!")
+            return redirect("newpost.html")
         else:
             return render_template("signup.html", email_error=email_err, name=username)
     elif regex.search(grps2.group(1)) and regex.search(grps2.group(2)):

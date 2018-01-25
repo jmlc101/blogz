@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Home</h1>
+<h1>User List</h1>
 
 
-<div id="box">
+<div class="box">
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+
+
 {% if not users %}
     <p>No Users Yet.</p> <!-- TODO - Lets change this into a flash message? -->
 {% else %}

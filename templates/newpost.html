@@ -4,7 +4,20 @@
 
 <h1>Add a Blog Entry</h1>
 
-<div id="box">
+<div class="box">
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+
+
+
     <form method='post'>
         <label>Title for your new blog:
             <input type="text" name="title" required/>
