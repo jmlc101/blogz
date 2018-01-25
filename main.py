@@ -73,7 +73,10 @@ def list_blogs():
         if userID:
             user = User.query.filter_by(id=userID).first()
             blogs = Blog.query.filter_by(owner=user).all()
-            return render_template('singleUser.html', user=user, blogs=blogs)
+            flipped_blogs = []
+            for blog in reversed(blogs):# TODO - Try doing this a more complex way, as the bonus suggests.
+                flipped_blogs.append(blog)
+            return render_template('singleUser.html', user=user, blogs=flipped_blogs)
         elif blogID:
             blog = Blog.query.filter_by(id=blogID).first()
             return render_template('display.html', title="display blog here", blog=blog)
@@ -104,12 +107,15 @@ def list_blogs():
 #        bodys.append(blog.body)
 #    return render_template('blog.html',title="Build A Blog!", blogs=flipped_blogs, blog_titles=blog_titles, bodys=bodys)
 
-@app.route('/singleUser')
+@app.route('/singleUser') # IS THIS DEAD CODE???
 def users_blogs():
     id = request.args.get('id')
+    flipped_blogs = []
     user = User.query.filter_by(id=id).first()
     blogs = Blog.query.filter_by(owner=user).all()
-    return render_template('singleUser.html', user=user, blogs=blogs)
+    for blog in reversed(blogs):# TODO - Try doing this a more complex way, as the bonus suggests.
+        flipped_blogs.append(blog)
+    return render_template('singleUser.html', user=user, blogs=flipped_blogs)
 
 @app.route('/display')
 def display():
