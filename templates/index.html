@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Home</h1>
+
+
+<div id="box">
+{% if not users %}
+    <p>No Users Yet.</p> <!-- TODO - Lets change this into a flash message? -->
+{% else %}
+    {% if users %}
+    {% for user in users %}
+        <h3><a href="/singleUser?id={{user.id}}">{{user.username}}</a></h3>
+    {% endfor %}
+    {% endif %}
+{% endif %}
+</div>
+{% endblock %}

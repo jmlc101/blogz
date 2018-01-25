@@ -30,6 +30,9 @@ class Blog(db.Model):
         self.body = body
         self.owner = owner
 
+    def __repr__(self):
+        return str(self.owner)
+
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,13 +46,45 @@ class User(db.Model):
         self.password = password
         self.email = email
 
-@app.route('/home')
-def home():
-    return render_template('index.html') # TODO - Will display list of usernames.
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'list_blogs', 'index', 'signup']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/home')
 def index():
-    blog_titles = []
+    users = User.query.filter(User.id > 0).all()
+    return render_template('index.html', users=users) # TODO - Will display list of usernames.
+
+@app.route('/blog', methods=['POST', 'GET'])
+def list_blogs():
+    
+    if request.method == 'GET':
+        userID = request.args.get('user')
+        blogID = request.args.get('id')
+        if userID:
+            user = User.query.filter_by(id=userID).first()
+            blogs = Blog.query.filter_by(owner=user).all()
+                return render_template('singleUser.html', user=user, blogs=blogs)
+        elif blogID:
+            blog = Blog.query.filter_by(id=blogID).first()
+            blog_title = blog.title
+            blog_body = blog.body
+            return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
+        else:
+            body = []
+            blogs = Blog.query.filter(Blog.id > 0).all()
+            flipped_blogs = []
+            for blog in reversed(blogs):
+                flipped_blogs.append(blog)
+
+            for blog in blogs:
+                bodys.append(blog.body)
+            return render_template('blog.html', title="Blogs", blogs=flipped_blogs, bodys=bodys)
+
+# Dead code beneath?:
+    blog_titles = [] # Dead Code?
     bodys = []
     blogs = Blog.query.filter(Blog.id > 0).all()
     
@@ -60,10 +95,24 @@ def index():
         flipped_blogs.append(blog)
 
     for blog in blogs:
-        blog_titles.append(blog.title)
+        blog_titles.append(blog.title) # Dead Code?
         bodys.append(blog.body)
     return render_template('blog.html',title="Build A Blog!", blogs=flipped_blogs, blog_titles=blog_titles, bodys=bodys)
 
+@app.route('/singleUser')
+def users_blogs():
+    id = request.args.get('id')
+    user = User.query.filter_by(id=id).first()
+    blogs = Blog.query.filter_by(owner=user).all()
+    return render_template('singleUser.html', user=user, blogs=blogs)
+
+@app.route('/display')
+def display():
+    id = request.args.get('id')
+    blog = Blog.query.filter_by(id=id).first()
+    blog_title = blog.title
+    blog_body = blog.body
+    return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
@@ -88,13 +137,9 @@ def newpost():
             return redirect('/display?id='+id)
     return render_template('newpost.html', title="Build A Blog!")
 
-@app.route('/display')
-def display():
-    id = request.args.get('id')
-    blog = Blog.query.filter_by(id=id).first()
-    blog_title = blog.title
-    blog_body = blog.body
-    return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
+
+
+
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -140,11 +185,11 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if session:
+    if session: # Should I change this to "if 'username' in session:" ??
         del session['username']
-        return redirect('/')
+        return redirect('/blog')
     else:
-        return redirect('/') # TODO - make sure all redirects are correct.
+        return redirect('/blog') # TODO - make sure all redirects are correct.
 
 if __name__ == '__main__':
     app.run()
