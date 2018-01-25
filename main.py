@@ -1,6 +1,8 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from validate_input import validate_input
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -24,11 +26,16 @@ class Blog(db.Model):
     title = db.Column(db.String(120))
     body = db.Column(db.String(2000))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pub_date = db.Column(db.DateTime)
 
-    def __init__(self, title, body, owner):
+
+    def __init__(self, title, body, owner, pub_date=None):
         self.title = title
         self.body = body
         self.owner = owner
+        if pub_date is None:
+            pub_date = datetime.utcnow()
+        self.pub_date = pub_date
 
     def __repr__(self):
         return str(self.owner)
@@ -158,7 +165,7 @@ def signup():
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
-    if session:
+    if 'username' in session:
         flash('Already logged in.')
         return redirect('/blog')
     if request.method == 'POST':
@@ -183,11 +190,11 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if session: # Should I change this to "if 'username' in session:" ??
+    if 'username' in session: # Should I change this to "if 'username' in session:" ??
         del session['username']
         flash("You've logged out.")
         return redirect('/blog')
-    elif not session:
+    elif 'username' not in session:
         flash("Not logged in.")
         return redirect('/blog') # TODO - make sure all redirects are correct.
 

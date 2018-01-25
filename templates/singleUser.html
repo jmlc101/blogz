@@ -5,8 +5,10 @@
 <div class="box">
 {% if blogs %}
 {% for blog in blogs %}
+    <hr>
     <h3><a href="/blog?id={{blog.id}}">{{blog.title}}</a></h3>
     <p>{{blog.body}}</p>
+    Published: {{ blog.pub_date }}
 {% endfor %}
 {% endif %}
 </div>
