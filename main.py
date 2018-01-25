@@ -66,14 +66,12 @@ def list_blogs():
         if userID:
             user = User.query.filter_by(id=userID).first()
             blogs = Blog.query.filter_by(owner=user).all()
-                return render_template('singleUser.html', user=user, blogs=blogs)
+            return render_template('singleUser.html', user=user, blogs=blogs)
         elif blogID:
             blog = Blog.query.filter_by(id=blogID).first()
-            blog_title = blog.title
-            blog_body = blog.body
-            return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body)
+            return render_template('display.html', title="display blog here", blog=blog)
         else:
-            body = []
+            bodys = []
             blogs = Blog.query.filter(Blog.id > 0).all()
             flipped_blogs = []
             for blog in reversed(blogs):

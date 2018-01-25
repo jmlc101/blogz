@@ -10,7 +10,7 @@
 {% else %}
     {% if users %}
     {% for user in users %}
-        <h3><a href="/singleUser?id={{user.id}}">{{user.username}}</a></h3>
+        <h3><a href="/blog?user={{user.id}}">{{user.username}}</a></h3>
     {% endfor %}
     {% endif %}
 {% endif %}
