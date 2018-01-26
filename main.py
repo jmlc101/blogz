@@ -13,8 +13,8 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'IllWorryAboutThisLater' # TODO - worry about this :)
 
-# TODO - Need to change '/' to '/blog' and '/home' to '/' as per directions....
-##
+
+
 # TODO - Hash passwords.
 # TODO - Try to break it.
 
@@ -91,40 +91,6 @@ def list_blogs():
                 bodys.append(blog.body)
             return render_template('blog.html', title="Blogs", blogs=flipped_blogs, bodys=bodys)
 
-# Dead code beneath?:
-#    blog_titles = [] # Dead Code?
-#    bodys = []
-#    blogs = Blog.query.filter(Blog.id > 0).all()
-#    
-#    # TODO - Try doing this a more complex way, as the bonus suggests.
-#    #flip blogs list around, the simple way
-#    flipped_blogs = []
-#    for blog in reversed(blogs):
-#        flipped_blogs.append(blog)###
-#
-#    for blog in blogs:
-#        blog_titles.append(blog.title) # Dead Code?
-#        bodys.append(blog.body)
-#    return render_template('blog.html',title="Build A Blog!", blogs=flipped_blogs, blog_titles=blog_titles, bodys=bodys)
-
-@app.route('/singleUser') # IS THIS DEAD CODE???
-def users_blogs():
-    id = request.args.get('id')
-    flipped_blogs = []
-    user = User.query.filter_by(id=id).first()
-    blogs = Blog.query.filter_by(owner=user).all()
-    for blog in reversed(blogs):# TODO - Try doing this a more complex way, as the bonus suggests.
-        flipped_blogs.append(blog)
-    return render_template('singleUser.html', user=user, blogs=flipped_blogs)
-
-@app.route('/display')
-def display():
-    id = request.args.get('id')
-    blog = Blog.query.filter_by(id=id).first()
-    blog_title = blog.title
-    blog_body = blog.body
-    return render_template('display.html', title="display blog here", blog_title=blog_title, blog_body=blog_body, blog=blog)
-
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():
     # TODO - Need validation to make sure body is string under 2000 characters, as db.Column specifies above.
@@ -145,7 +111,7 @@ def newpost():
             db.session.commit()
             id = new_blog.id
             id = str(id)
-            return redirect('/display?id='+id)
+            return redirect('/blog?id='+id)
     return render_template('newpost.html', title="Build A Blog!")
 
 
@@ -190,8 +156,6 @@ def login():
             return redirect('/login')
 
     return render_template('login.html')
-
-@app.route('/index')
 
 @app.route('/logout')
 def logout():
