@@ -19,7 +19,7 @@ def validate_input(username, password, verify, email):
     tom.validate_email(email)
     tom.valid_count()
     
-    if tom.valid:
+    if tom.valid == True:
         new_user = User(username, password, email)
         db.session.add(new_user)
         db.session.commit()
@@ -112,8 +112,8 @@ def validate_input(username, password, verify, email):
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            flash("Welcome! You're Logged in!")
-            return redirect("newpost.html")
+            flash("Welcome! You're Logged in!") # is this Dead code?????????????/
+            return redirect("/newpost")
         else:
             return render_template("signup.html", email_error=email_err, name=username)
     elif regex.search(grps2.group(1)) and regex.search(grps2.group(2)):

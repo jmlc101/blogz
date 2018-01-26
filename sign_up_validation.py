@@ -37,10 +37,14 @@ class SignUpValidation:
     def validate_email(self, email):
         import re
         email_regex = r"^\w+@\w+\.\w+$"
-        if re.search(email_regex, email):
+        if email == '':
+            self.validation_count += 6
+            return True
+        elif re.search(email_regex, email):
             self.validation_count += 6
             return True
         elif re.search(email_regex, email) == None:
+            self.validation_count += 1
             return False
 
     def valid_count(self):
