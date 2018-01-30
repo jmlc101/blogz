@@ -1,11 +1,100 @@
-def validate_input(username, password, verify, email):
-    from flask import Flask, render_template, request, redirect, flash
-    import re
-    from sign_up_validation import SignUpValidation
-    
-    from main import db, User # Keep an eye on this stuff.
+from flask import Flask, render_template, request, redirect, flash, session
+from app import db
+from datetime import datetime
+import re
 
-    from flask import session # is this proper use of sessions?
+class Blog(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120))
+    body = db.Column(db.String(2000))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pub_date = db.Column(db.DateTime)
+
+
+    def __init__(self, title, body, owner, pub_date=None):
+        self.title = title
+        self.body = body
+        self.owner = owner
+        if pub_date is None:
+            pub_date = datetime.utcnow()
+        self.pub_date = pub_date
+
+    def __repr__(self):
+        return str(self.owner)
+
+class User(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120))
+    password = db.Column(db.String(120))
+    email = db.Column(db.String(120))
+    blogz = db.relationship('Blog', backref='owner')
+
+    def __init__(self, username, password, email):
+        self.username = username
+        self.password = password
+        self.email = email
+
+class SignUpValidation:
+    import re 
+    regex = re.compile(r"\w{3,20}")
+    def __init__(self):
+        self.validation_count = 0
+        self.valid = False
+        
+    def validate_username(self, username):
+        import re
+        regex = re.compile(r"\w{3,20}")
+        if regex.search(username):
+            self.validation_count += 1
+            return True
+        elif regex.search(username) == None:
+            return False
+
+    def validate_password(self, password):
+        import re
+        regex = re.compile(r"\w{3,20}")
+        if regex.search(password):
+            self.validation_count += 1
+            return True
+        elif regex.search(password) == None:
+            return False
+        
+
+    def validate_pass_verify(self, password, verify):
+        import re
+        regex = re.compile(r"\w{3,20}")
+        if (password == verify) and regex.search(password):
+            self.validation_count += 3
+        if (password == verify):
+            return True
+        else:
+            return False
+        
+    def validate_email(self, email):
+        import re
+        email_regex = r"^\w+@\w+\.\w+$"
+        if email == '':
+            self.validation_count += 6
+            return True
+        elif re.search(email_regex, email):
+            self.validation_count += 6
+            return True
+        elif re.search(email_regex, email) == None:
+            self.validation_count += 1
+            return False
+
+    def valid_count(self):
+        if (self.validation_count == 5) or (self.validation_count == 11):
+            self.valid = True
+        return self.validation_count
+
+    def __repr__(self):
+        return str(self.valid) 
+
+
+def validate_input(username, password, verify, email):
 
     name_error_msg = "That's not a valid username"
     pass_error_msg = "That's not a valid password"

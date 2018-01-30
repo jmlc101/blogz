@@ -1,56 +1,15 @@
 from flask import Flask, request, redirect, render_template, session, flash
-from flask_sqlalchemy import SQLAlchemy
-from validate_input import validate_input
-from datetime import datetime
+from models import validate_input, User, Blog
+from app import app, db
 
-
-app = Flask(__name__)
-app.config['DEBUG'] = True
-# Note: the connection string after :// contains the following info:
-# user:password@server:portNumber/databaseName
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8889/blogz'
-app.config['SQLALCHEMY_ECHO'] = True
-db = SQLAlchemy(app)
-app.secret_key = 'PublicTestKey' # TODO - Made Public! Change this for private app! :)
 
 # TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
 # TODO - Try to break it.
+# TODO - Implement an auto log out function.
 
 
-class Blog(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120))
-    body = db.Column(db.String(2000))
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    pub_date = db.Column(db.DateTime)
-
-
-    def __init__(self, title, body, owner, pub_date=None):
-        self.title = title
-        self.body = body
-        self.owner = owner
-        if pub_date is None:
-            pub_date = datetime.utcnow()
-        self.pub_date = pub_date
-
-    def __repr__(self):
-        return str(self.owner)
-
-class User(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120))
-    password = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    blogz = db.relationship('Blog', backref='owner')
-
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
 
 @app.before_request
 def require_login():
