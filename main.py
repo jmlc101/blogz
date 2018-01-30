@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'PublicTestKey' # TODO - Made Public! Change this for private app! :)
 
-
+# TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
 # TODO - Try to break it.
