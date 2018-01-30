@@ -11,11 +11,11 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-app.secret_key = 'IllWorryAboutThisLater' # TODO - worry about this :)
+app.secret_key = 'PublicTestKey' # TODO - Made Public! Change this for private app! :)
 
 
-
-# TODO - Hash passwords.
+# TODO - add Pagination "bonus mission"
+# TODO - Hash passwords. "bonus mission"
 # TODO - Try to break it.
 
 
