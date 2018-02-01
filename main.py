@@ -111,7 +111,7 @@ def login():
             ##########################
             # test complete
             return redirect('/newpost')
-        elif user and user.password != password:### need to insert user into template so they dont have to retype.
+        elif user and (check_pw_hash(password, user.pw_hash) == False):### need to insert user into template so they dont have to retype.
             flash('Incorrect password.')
             return redirect('/login')
         elif not user:
