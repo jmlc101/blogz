@@ -1,7 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+from flask_sslify import SSLify
+
 app = Flask(__name__)
+
+sslify = SSLify(app)
+
 app.config['DEBUG'] = True
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName

@@ -3,6 +3,7 @@ from models import validate_input, User, Blog
 from app import app, db
 
 from hashutils import check_pw_hash
+
 # TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
@@ -111,7 +112,7 @@ def login():
             ##########################
             # test complete
             return redirect('/newpost')
-        elif user and user.password != password:### need to insert user into template so they dont have to retype.
+        elif user and (check_pw_hash(password, user.pw_hash) == False):### need to insert user into template so they dont have to retype.
             flash('Incorrect password.')
             return redirect('/login')
         elif not user:
