@@ -1,56 +1,15 @@
 from flask import Flask, request, redirect, render_template, session, flash
-from flask_sqlalchemy import SQLAlchemy
-from validate_input import validate_input
-from datetime import datetime
+from models import validate_input, User, Blog
+from app import app, db
 
-
-app = Flask(__name__)
-app.config['DEBUG'] = True
-# Note: the connection string after :// contains the following info:
-# user:password@server:portNumber/databaseName
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:12345@localhost:8889/blogz'
-app.config['SQLALCHEMY_ECHO'] = True
-db = SQLAlchemy(app)
-app.secret_key = 'PublicTestKey' # TODO - Made Public! Change this for private app! :)
-
+from hashutils import check_pw_hash
 # TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
 # TODO - Try to break it.
+# TODO - Implement an auto log out function.
+# TODO - Lets add some cookies.
 
-
-class Blog(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120))
-    body = db.Column(db.String(2000))
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    pub_date = db.Column(db.DateTime)
-
-
-    def __init__(self, title, body, owner, pub_date=None):
-        self.title = title
-        self.body = body
-        self.owner = owner
-        if pub_date is None:
-            pub_date = datetime.utcnow()
-        self.pub_date = pub_date
-
-    def __repr__(self):
-        return str(self.owner)
-
-class User(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120))
-    password = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    blogz = db.relationship('Blog', backref='owner')
-
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
 
 @app.before_request
 def require_login():
@@ -128,7 +87,7 @@ def signup():
 
         existing_user = User.query.filter_by(username=username).first() #If user exists, will assign vaule, otherwise will assign 'NONE'.
         if not existing_user:
-            return validate_input(username, password, verify, email)
+            return validate_input(username, password, verify, email) #I hate this validation style.
         else:
             return render_template('signup.html', user_name_error='Username already exists.')
 
@@ -144,11 +103,15 @@ def login():
         password = request.form['password']
         
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username 
             flash("Welcome! You're Logged in!")
+            # test
+            
+            ##########################
+            # test complete
             return redirect('/newpost')
-        elif user and user.password != password:
+        elif user and user.password != password:### need to insert user into template so they dont have to retype.
             flash('Incorrect password.')
             return redirect('/login')
         elif not user:
@@ -159,13 +122,9 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if 'username' in session:
-        del session['username']
-        flash("You've logged out.")
-        return redirect('/blog')
-    elif 'username' not in session:
-        flash("Not logged in.")
-        return redirect('/blog')
+    session.pop('username', None)
+    flash("Logged Out.")
+    return redirect('/blog')
 
 if __name__ == '__main__':
     app.run()
