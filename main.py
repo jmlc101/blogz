@@ -2,13 +2,13 @@ from flask import Flask, request, redirect, render_template, session, flash
 from models import validate_input, User, Blog
 from app import app, db
 
-
+from hashutils import check_pw_hash
 # TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
 # TODO - Try to break it.
 # TODO - Implement an auto log out function.
-
+# TODO - Lets add some cookies.
 
 
 @app.before_request
@@ -87,7 +87,7 @@ def signup():
 
         existing_user = User.query.filter_by(username=username).first() #If user exists, will assign vaule, otherwise will assign 'NONE'.
         if not existing_user:
-            return validate_input(username, password, verify, email)
+            return validate_input(username, password, verify, email) #I hate this validation style.
         else:
             return render_template('signup.html', user_name_error='Username already exists.')
 
@@ -103,11 +103,15 @@ def login():
         password = request.form['password']
         
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username 
             flash("Welcome! You're Logged in!")
+            # test
+            
+            ##########################
+            # test complete
             return redirect('/newpost')
-        elif user and user.password != password:
+        elif user and user.password != password:### need to insert user into template so they dont have to retype.
             flash('Incorrect password.')
             return redirect('/login')
         elif not user:
@@ -118,13 +122,9 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if 'username' in session:
-        del session['username']
-        flash("You've logged out.")
-        return redirect('/blog')
-    elif 'username' not in session:
-        flash("Not logged in.")
-        return redirect('/blog')
+    session.pop('username', None)
+    flash("Logged Out.")
+    return redirect('/blog')
 
 if __name__ == '__main__':
     app.run()
