@@ -3,6 +3,7 @@ from models import validate_input, User, Blog
 from app import app, db
 
 from hashutils import check_pw_hash
+
 # TODO - Testing branch protection configurations.
 # TODO - add Pagination "bonus mission"
 # TODO - Hash passwords. "bonus mission"
