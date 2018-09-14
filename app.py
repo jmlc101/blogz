@@ -9,7 +9,7 @@ sslify = SSLify(app)
 
 # TODO - Change DEBUG to False in order for the flask-sslify extenion to work. Redirects incoming requests to Https.
 # obviously, change to True to see DEBUG in Terminal when running app.
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://Blogz:Blogz@localhost:3306/Blogz'
